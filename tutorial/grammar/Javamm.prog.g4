@@ -23,8 +23,8 @@ statement
     ;
 
 expression
-    : expression op=('*' | '/') expression #BinaryOp
-    | expression op=('+' | '-') expression #BinaryOp
-    | value=INTEGER #Integer
-    | value=ID #Identifier
+    : expression ('*' | '/') expression
+    | expression ('+' | '-') expression
+    | INTEGER
+    | ID
     ;

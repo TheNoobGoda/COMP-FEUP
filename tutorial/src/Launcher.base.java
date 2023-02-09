@@ -43,18 +43,26 @@ public class Launcher {
         // Read contents of input file
         String code = SpecsIo.read(inputFile);
 
-        // Instantiate JmmParser
-        SimpleParser parser = new SimpleParser();
+        // Convert code string into a character stream
+        var input = new ANTLRInputStream(code);
+        // Transform characters into tokens using the lexer
+        var lex = new pt.up.fe.comp2023.JavammLexer(input);
+        // Wrap lexer around a token stream
+        var tokens = new CommonTokenStream(lex);
+        // Transform tokens into a parse tree
+        var parser = new pt.up.fe.comp2023.JavammParser(tokens);
+        System.out.println(Arrays.asList(parser.ignoreList));
+        ParseTree root = parser.program();
 
-        // Parse stage
-        JmmParserResult parserResult = parser.parse(code, config);
 
-        System.out.println(parserResult.getRootNode().toTree());
+        //show AST in terminal
+        System.out.println(root.toStringTree(parser));
 
-        // Check if there are parsing errors
-        TestUtils.noErrors(parserResult.getReports());
-
-        // ... add remaining stages
+        //show AST in GUI
+        TreeViewer viewer = new TreeViewer(
+                Arrays.asList(parser.getRuleNames()),
+                root);
+        viewer.open();
     }
 
     private static Map<String, String> parseArgs(String[] args) {
@@ -68,10 +76,8 @@ public class Launcher {
         // Create config
         Map<String, String> config = new HashMap<>();
         config.put("inputFile", args[0]);
-        config.put("optimize", "false");
-        config.put("registerAllocation", "-1");
-        config.put("debug", "false");
 
         return config;
     }
+
 }
